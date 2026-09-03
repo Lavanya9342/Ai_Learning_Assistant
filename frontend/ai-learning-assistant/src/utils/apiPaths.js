@@ -1,4 +1,5 @@
-export const BASE_URL = "http://localhost:8000";
+
+export const BASE_URL = "https://ai-learning-assistant-4v99.onrender.com/api";
 
 export const API_PATHS = {
     AUTH: {
