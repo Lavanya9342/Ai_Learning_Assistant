@@ -16,20 +16,40 @@ import aiRoutes from "./routes/aiRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import progressRoutes from "./routes/progressRoutes.js";
 
+// ========================================
+// Environment Variables
+// ========================================
+
 dotenv.config();
 
+// ========================================
+// DNS
+// ========================================
+
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+// ========================================
+// __dirname for ES Modules
+// ========================================
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ========================================
+// Express App
+// ========================================
+
 const app = express();
+
+// ========================================
+// MongoDB Connection
+// ========================================
 
 connectDB();
 
-// ===============================
+// ========================================
 // CORS
-// ===============================
+// ========================================
 
 const allowedOrigins = [
   "https://ai-learning-three-taupe.vercel.app",
@@ -39,15 +59,21 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Allow Postman and requests without origin
       if (!origin) {
         return callback(null, true);
       }
 
+      // Allow frontend origins
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      console.log("Blocked CORS Origin:", origin);
+
+      return callback(
+        new Error("Not allowed by CORS")
+      );
     },
 
     methods: [
@@ -68,27 +94,32 @@ app.use(
   })
 );
 
-app.options("*", cors());
-
-// ===============================
+// ========================================
 // Body Parser
-// ===============================
+// ========================================
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// ===============================
-// Uploads
-// ===============================
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
+// ========================================
+// Static Uploads Folder
+// ========================================
 
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+  express.static(
+    path.join(__dirname, "uploads")
+  )
 );
 
-// ===============================
+// ========================================
 // Root Route
-// ===============================
+// ========================================
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -97,31 +128,49 @@ app.get("/", (req, res) => {
   });
 });
 
-// ===============================
+// ========================================
 // API Routes
-// ===============================
+// ========================================
 
-app.use("/api/auth", authRoutes);
+app.use(
+  "/api/auth",
+  authRoutes
+);
 
-app.use("/api/documents", documentRoutes);
+app.use(
+  "/api/documents",
+  documentRoutes
+);
 
-app.use("/api/flashcards", flashcardRoutes);
+app.use(
+  "/api/flashcards",
+  flashcardRoutes
+);
 
-app.use("/api/ai", aiRoutes);
+app.use(
+  "/api/ai",
+  aiRoutes
+);
 
-app.use("/api/quizzes", quizRoutes);
+app.use(
+  "/api/quizzes",
+  quizRoutes
+);
 
-app.use("/api/progress", progressRoutes);
+app.use(
+  "/api/progress",
+  progressRoutes
+);
 
-// ===============================
+// ========================================
 // Error Handler
-// ===============================
+// ========================================
 
 app.use(errorHandler);
 
-// ===============================
-// 404
-// ===============================
+// ========================================
+// 404 Handler
+// ========================================
 
 app.use((req, res) => {
   res.status(404).json({
@@ -131,9 +180,9 @@ app.use((req, res) => {
   });
 });
 
-// ===============================
-// Server
-// ===============================
+// ========================================
+// Start Server
+// ========================================
 
 const PORT = process.env.PORT || 8000;
 
@@ -143,11 +192,18 @@ app.listen(PORT, () => {
   );
 });
 
-// ===============================
-// Unhandled Rejection
-// ===============================
+// ========================================
+// Unhandled Promise Rejection
+// ========================================
 
-process.on("unhandledRejection", (err) => {
-  console.error(`Unhandled Rejection: ${err.message}`);
-  process.exit(1);
-});
+process.on(
+  "unhandledRejection",
+  (err) => {
+    console.error(
+      "Unhandled Rejection:",
+      err.message
+    );
+
+    process.exit(1);
+  }
+);
