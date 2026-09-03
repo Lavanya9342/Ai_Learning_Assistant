@@ -23,10 +23,13 @@ import progressRoutes from "./routes/progressRoutes.js";
 dotenv.config();
 
 // ========================================
-// DNS
+// DNS Configuration
 // ========================================
 
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
+dns.setServers([
+  "8.8.8.8",
+  "8.8.4.4",
+]);
 
 // ========================================
 // __dirname for ES Modules
@@ -48,33 +51,12 @@ const app = express();
 connectDB();
 
 // ========================================
-// CORS
+// CORS Configuration
 // ========================================
-
-const allowedOrigins = [
-  "https://ai-learning-three-taupe.vercel.app",
-  "http://localhost:5173",
-];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow Postman and requests without origin
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      // Allow frontend origins
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.log("Blocked CORS Origin:", origin);
-
-      return callback(
-        new Error("Not allowed by CORS")
-      );
-    },
+    origin: true,
 
     methods: [
       "GET",
@@ -129,34 +111,51 @@ app.get("/", (req, res) => {
 });
 
 // ========================================
+// Health Check Route
+// ========================================
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is healthy",
+  });
+});
+
+// ========================================
 // API Routes
 // ========================================
 
+// Authentication
 app.use(
   "/api/auth",
   authRoutes
 );
 
+// Documents
 app.use(
   "/api/documents",
   documentRoutes
 );
 
+// Flashcards
 app.use(
   "/api/flashcards",
   flashcardRoutes
 );
 
+// AI
 app.use(
   "/api/ai",
   aiRoutes
 );
 
+// Quizzes
 app.use(
   "/api/quizzes",
   quizRoutes
 );
 
+// Progress
 app.use(
   "/api/progress",
   progressRoutes
