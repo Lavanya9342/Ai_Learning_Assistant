@@ -16,70 +16,79 @@ import aiRoutes from "./routes/aiRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import progressRoutes from "./routes/progressRoutes.js";
 
-// --------------------------------------------------
-// Load Environment Variables
-// --------------------------------------------------
-
-dotenv.config({
-  path: path.resolve(process.cwd(), ".env"),
-});
-
-// --------------------------------------------------
-// DNS Configuration
-// --------------------------------------------------
+dotenv.config();
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
-// --------------------------------------------------
-// ES6 __dirname Configuration
-// --------------------------------------------------
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --------------------------------------------------
-// Initialize Express
-// --------------------------------------------------
-
 const app = express();
-
-// --------------------------------------------------
-// Connect MongoDB
-// --------------------------------------------------
 
 connectDB();
 
-// --------------------------------------------------
-// CORS Middleware
-// --------------------------------------------------
+// ===============================
+// CORS
+// ===============================
+
+const allowedOrigins = [
+  "https://ai-learning-three-taupe.vercel.app",
+  "http://localhost:5173",
+];
 
 app.use(
   cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: function (origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "PATCH",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+
+    credentials: true,
   })
 );
 
-// --------------------------------------------------
-// Body Parser Middleware
-// --------------------------------------------------
+app.options("*", cors());
+
+// ===============================
+// Body Parser
+// ===============================
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --------------------------------------------------
-// Static Folder for Uploads
-// --------------------------------------------------
+// ===============================
+// Uploads
+// ===============================
 
 app.use(
   "/uploads",
   express.static(path.join(__dirname, "uploads"))
 );
 
-// --------------------------------------------------
-// ROOT ROUTE
-// --------------------------------------------------
+// ===============================
+// Root Route
+// ===============================
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -88,9 +97,9 @@ app.get("/", (req, res) => {
   });
 });
 
-// --------------------------------------------------
+// ===============================
 // API Routes
-// --------------------------------------------------
+// ===============================
 
 app.use("/api/auth", authRoutes);
 
@@ -104,15 +113,15 @@ app.use("/api/quizzes", quizRoutes);
 
 app.use("/api/progress", progressRoutes);
 
-// --------------------------------------------------
+// ===============================
 // Error Handler
-// --------------------------------------------------
+// ===============================
 
 app.use(errorHandler);
 
-// --------------------------------------------------
-// 404 Handler
-// --------------------------------------------------
+// ===============================
+// 404
+// ===============================
 
 app.use((req, res) => {
   res.status(404).json({
@@ -122,24 +131,23 @@ app.use((req, res) => {
   });
 });
 
-// --------------------------------------------------
-// Start Server
-// --------------------------------------------------
+// ===============================
+// Server
+// ===============================
 
 const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
   console.log(
-    `Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`
+    `Server running on port ${PORT}`
   );
 });
 
-// --------------------------------------------------
-// Handle Unhandled Promise Rejection
-// --------------------------------------------------
+// ===============================
+// Unhandled Rejection
+// ===============================
 
 process.on("unhandledRejection", (err) => {
   console.error(`Unhandled Rejection: ${err.message}`);
-
   process.exit(1);
 });
