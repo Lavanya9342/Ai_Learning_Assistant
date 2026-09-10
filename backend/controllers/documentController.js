@@ -32,9 +32,12 @@ export const uploadDocument = async (req, res, next) => {
         }
 
         // Construct the URL for the uploaded file
-        const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 8000}`;
-        const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
+        const baseUrl =
+    process.env.NODE_ENV === "production"
+        ? "https://ai-learning-assistant-4v99.onrender.com"
+        : `http://localhost:${process.env.PORT || 8000}`;
 
+const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
         // Create document record
         const document = await Document.create({
             userId: req.user._id,
