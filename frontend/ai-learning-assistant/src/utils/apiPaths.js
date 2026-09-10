@@ -3,11 +3,11 @@ export const BASE_URL = "https://ai-learning-assistant-4v99.onrender.com/api";
 
 export const API_PATHS = {
     AUTH: {
-        REGISTER: "/api/auth/register",
-        LOGIN: "/api/auth/login",
-        GET_PROFILE: "/api/auth/profile",
-        UPDATE_PROFILE: "/api/auth/profile",
-        CHANGE_PASSWORD: "/api/auth/change-password",
+        REGISTER: "/auth/register",
+        LOGIN: "/auth/login",
+        GET_PROFILE: "/auth/profile",
+        UPDATE_PROFILE: "/auth/profile",
+        CHANGE_PASSWORD: "/auth/change-password",
     },
 
     DOCUMENTS: {
